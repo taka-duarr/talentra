@@ -73,7 +73,7 @@
                     <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h11"/><path d="M9.5 6v13"/><path d="m14 15 5-5"/><path d="M15.5 10H19v3.5"/></svg>
                 </a>
                 <div class="min-w-0 flex-1">
-                    <p class="truncate text-lg font-extrabold tracking-tight sm:text-xl">{{ $greeting }}, {{ $user?->publicName() }} <span class="inline-block origin-bottom-right animate-[float-soft_3s_ease-in-out_infinite]" aria-hidden="true">👋</span></p>
+                    <p class="truncate text-lg font-extrabold tracking-tight sm:text-xl">{{ $greeting }}, {{ $user?->publicName() }}</p>
                     <p class="truncate text-xs text-muted sm:text-sm">{{ $localNow->translatedFormat('l, d F Y') }} · Ayo lanjutkan latihanmu hari ini</p>
                 </div>
 

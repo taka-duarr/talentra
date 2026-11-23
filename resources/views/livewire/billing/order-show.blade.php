@@ -35,7 +35,7 @@
         @if (($instructions['type'] ?? '') === 'midtrans')
             <section class="card mt-6 p-5">
                 <div class="flex items-center gap-3">
-                    <span class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-brand-50 text-brand-700 font-bold text-sm">✓</span>
+                    <span class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-brand-50 text-brand-700 font-bold text-sm"><x-icon name="check" class="size-4" /></span>
                     <div>
                         <h2 class="font-bold text-lg">Selesaikan Pembayaran</h2>
                         <p class="text-xs text-muted">Metode: <strong class="text-ink">{{ $methodLabel }}</strong> · Pembayaran Otomatis</p>
@@ -67,11 +67,11 @@
                     @endif
                     @if (!empty($instructions['redirect_url']))
                         <a href="{{ $instructions['redirect_url'] }}" target="_blank" rel="noopener noreferrer" class="btn {{ empty($instructions['client_key']) ? 'btn-primary' : 'btn-secondary' }}">
-                            Buka Halaman Pembayaran Midtrans ↗
+                            Buka Halaman Pembayaran Midtrans
                         </a>
                     @endif
                     <button type="button" wire:click="checkPaymentStatus" class="btn btn-outline" wire:loading.attr="disabled">
-                        <span wire:loading.remove wire:target="checkPaymentStatus">🔄 Cek Status Pembayaran</span>
+                        <span wire:loading.remove wire:target="checkPaymentStatus">Cek Status Pembayaran</span>
                         <span wire:loading wire:target="checkPaymentStatus">Memeriksa…</span>
                     </button>
                 </div>
