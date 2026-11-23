@@ -57,7 +57,7 @@
             <ul class="divide-y divide-line text-sm">
                 @forelse ($attempts as $attempt)
                     <li class="flex justify-between px-5 py-2.5">
-                        <span>{{ $attempt->package->title }} <span class="text-xs text-subtle">{{ $attempt->started_at->translatedFormat('d M Y') }}</span></span>
+                        <a href="{{ route('admin.attempts.show', $attempt) }}" wire:navigate class="hover:text-brand-700">{{ $attempt->package->title }} <span class="text-xs text-subtle">{{ $attempt->started_at->translatedFormat('d M Y') }}</span></a>
                         <span>{{ $attempt->isInProgress() ? 'Berjalan' : $attempt->percentage().'%' }} @if ($attempt->tab_switches) <span class="text-xs text-sun-600">· pindah tab {{ $attempt->tab_switches }}×</span> @endif</span>
                     </li>
                 @empty

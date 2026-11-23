@@ -15,7 +15,7 @@ interface PaymentGateway
     /**
      * Prepares the order for payment and returns what the order page shows the buyer.
      *
-     * @return array{type: string, accounts?: array<int, array{bank: string, number: string, holder: string}>, contact?: string, redirect_url?: string}
+     * @return array{type: string, accounts?: array<int, array{bank: string, number: string, holder: string}>, contact?: string, redirect_url?: string, snap_token?: string, client_key?: string, is_production?: bool}
      */
     public function instructions(Order $order): array;
 

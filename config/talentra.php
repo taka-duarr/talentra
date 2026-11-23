@@ -16,6 +16,12 @@ return [
             ],
             'contact' => env('TALENTRA_PAYMENT_CONTACT', 'admin@talentra.test'),
         ],
+        'midtrans' => [
+            'server_key' => env('MIDTRANS_SERVER_KEY'),
+            'client_key' => env('MIDTRANS_CLIENT_KEY'),
+            'merchant_id' => env('MIDTRANS_MERCHANT_ID'),
+            'is_production' => (bool) env('MIDTRANS_IS_PRODUCTION', false),
+        ],
         'methods' => [
             'qris' => 'QRIS',
             'bank_transfer' => 'Transfer bank / Virtual Account',

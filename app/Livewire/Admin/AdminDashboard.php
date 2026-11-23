@@ -7,6 +7,7 @@ use App\Enums\ContentStatus;
 use App\Enums\OrderStatus;
 use App\Models\AiAnalysis;
 use App\Models\ExamAttempt;
+use App\Models\ForumReport;
 use App\Models\Order;
 use App\Models\Question;
 use App\Models\Subscription;
@@ -50,6 +51,8 @@ class AdminDashboard extends Component
                 'revenueThisMonth' => (int) Order::query()->where('status', OrderStatus::Paid)->where('paid_at', '>=', now()->startOfMonth())->sum('total'),
                 'attemptsToday' => ExamAttempt::query()->where('status', AttemptStatus::Submitted)->whereDate('submitted_at', today())->count(),
                 'questionsInReview' => Question::query()->where('status', ContentStatus::Review)->count(),
+                'openReports' => ForumReport::query()->open()->distinct()->count(DB::raw("concat(reportable_type, ':', reportable_id)")),
+                'questionsTotal' => Question::query()->count(),
                 'aiAnalysesToday' => AiAnalysis::query()->where('source', 'ai')->whereDate('created_at', today())->count(),
                 'aiTokensMonth' => (int) AiAnalysis::query()->where('created_at', '>=', now()->startOfMonth())->sum(DB::raw('input_tokens + output_tokens')),
             ],
@@ -58,6 +61,12 @@ class AdminDashboard extends Component
                 'value' => (int) ($revenueByMonth[$month->format('Y-m')] ?? 0),
             ]),
             'hardestQuestions' => $hardestQuestions,
+            'latestAttempts' => ExamAttempt::query()
+                ->where('status', AttemptStatus::Submitted)
+                ->with(['user', 'package'])
+                ->latest('submitted_at')
+                ->take(8)
+                ->get(),
             'isSuper' => auth()->user()->isSuperAdmin(),
         ]);
     }

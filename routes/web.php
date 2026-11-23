@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\QuestionTemplateController;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Http\Controllers\ExamController;
+use App\Http\Controllers\MidtransWebhookController;
 use App\Http\Controllers\PaymentProofController;
 use App\Http\Controllers\PracticeController;
 use App\Livewire\Admin;
@@ -31,6 +32,8 @@ use App\Livewire\Tryout\TryoutShow;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'landing')->name('home');
+
+Route::post('/midtrans/webhook', MidtransWebhookController::class)->name('midtrans.webhook');
 
 Route::middleware('guest')->group(function () {
     Route::livewire('/masuk', Login::class)->name('login');
@@ -87,6 +90,8 @@ Route::middleware(['auth', 'not-blocked'])->group(function () {
 
 Route::middleware(['auth', 'not-blocked', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::livewire('/', Admin\AdminDashboard::class)->name('dashboard');
+    Route::livewire('/hasil', Admin\Attempts\AttemptIndex::class)->name('attempts.index');
+    Route::livewire('/hasil/{attempt}', Admin\Attempts\AttemptShow::class)->name('attempts.show');
     Route::livewire('/kategori', Admin\Catalog::class)->name('categories');
 
     Route::livewire('/materi', Admin\Materials\MaterialIndex::class)->name('materials.index');
