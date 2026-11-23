@@ -11,7 +11,8 @@ class LandingPageTest extends TestCase
         $response = $this->get(route('home'));
 
         $response->assertOk();
-        $response->assertSee('TALENTRA');
+        $response->assertSee('Talentra');
+        $response->assertSee('Belajar Terarah');
         $response->assertSee('Coba Gratis Sekarang');
         $response->assertSee('Semua Akses');
         $response->assertSee('Masuk');

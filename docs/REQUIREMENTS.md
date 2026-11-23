@@ -5,10 +5,14 @@
 
 | | |
 |---|---|
-| Versi dokumen | 0.2 (draf) |
+| Versi dokumen | 0.3 (draf) |
 | Tanggal | 23 November 2026 |
 | Sumber | Proposal Konsep Bisnis Talentra (Kewirausahaan, ITATS) + kebutuhan fitur dari tim |
 | Status | Menunggu review tim |
+
+### Perubahan dari versi 0.2
+- Fitur berikut **dikeluarkan dari cakupan** dan tidak dikerjakan: try out nasional terjadwal, referral, PWA, notifikasi WhatsApp, log aktivitas admin, dan login Google.
+- Fase 1, Fase 2, dan import soal dari Excel sudah selesai dibangun. Sisa pekerjaan: integrasi payment gateway.
 
 ### Perubahan dari versi 0.1
 - Role **admin institusi** dan **paket institusi** dihapus. Talentra berjalan independen dan hanya melayani pengguna perorangan.
@@ -46,7 +50,7 @@ Talentra adalah website tempat pengguna **belajar materi**, **mengerjakan latiha
 | Queue & cache | Database driver (awal) → Redis (saat pengguna ramai) |
 | Pembayaran | UI dulu + aktivasi manual. Gateway (Midtrans/Xendit) menyusul |
 | AI analisis | LLM API (provider dipilih saat implementasi), dipanggil lewat queue |
-| Auth & role | Laravel Breeze/Fortify + Spatie Permission, opsional login Google (Socialite) |
+| Auth & role | Autentikasi Laravel (komponen Livewire sendiri), peran disimpan di kolom `users.role` |
 
 ### Catatan arsitektur Livewire + Inertia
 - Semua halaman memakai layout Blade + Livewire, **kecuali** route `/ujian/*`.
@@ -85,7 +89,7 @@ Talentra adalah website tempat pengguna **belajar materi**, **mengerjakan latiha
 ### 4.2 Autentikasi
 
 - Tombol **Masuk** dan **Daftar** di navbar landing page.
-- Daftar dengan email + password, atau **login dengan Google**.
+- Daftar dengan email + password.
 - Verifikasi email, lupa password.
 - Saat daftar, user memilih **tujuan ujian** (contoh: UTBK) untuk personalisasi dashboard.
 - Jika pengunjung menekan "Coba demo", "Langganan", atau "Tulis di forum" sebelum login, arahkan ke login lalu **kembali ke halaman semula** setelah berhasil.
@@ -305,7 +309,6 @@ Talentra adalah website tempat pengguna **belajar materi**, **mengerjakan latiha
 - **Statistik soal**: soal yang paling sering salah atau terlalu mudah (kandidat perbaikan).
 - Pemakaian & biaya AI (jumlah analisis, token terpakai).
 - Pengaturan situs: nama, logo, kontak, rekening transfer manual, kuota AI, batas demo.
-- **Log aktivitas admin** (siapa mengubah apa dan kapan).
 
 ---
 
@@ -319,10 +322,9 @@ Talentra adalah website tempat pengguna **belajar materi**, **mengerjakan latiha
 | 4 | **Alur review soal** (draf → review → terbit) | Mengurangi risiko soal salah dan masalah hak cipta, seperti yang disebut di proposal. |
 | 5 | **Kisi-kisi disimpan sebagai pengaturan** | Passing grade, jumlah soal, dan durasi berubah tiap tahun, jadi jangan ditulis di kode. |
 | 6 | **Syarat & ketentuan, kebijakan privasi, pedoman komunitas** | Wajib untuk pembayaran online, forum publik, dan sesuai UU PDP. Pengguna SD/SMP di bawah umur sebaiknya butuh persetujuan orang tua. |
-| 7 | **Try out nasional terjadwal** (fase lanjut) | Semua peserta mengerjakan di waktu sama lalu langsung masuk ranking. Efektif untuk promosi. |
-| 8 | **Latihan per topik dari rekomendasi AI** | User langsung latihan 10 soal di topik yang lemah. |
-| 9 | **Tombol "Jelaskan lebih sederhana" di pembahasan** | Memperkuat positioning AI. |
-| 10 | **Fokus 1–2 kategori untuk rilis pertama** | Contoh UTBK + CPNS. Kategori lain ditambah setelah bank soal siap. |
+| 7 | **Latihan per topik dari rekomendasi AI** | User langsung latihan 10 soal di topik yang lemah. |
+| 8 | **Tombol "Jelaskan lebih sederhana" di pembahasan** | Memperkuat positioning AI. |
+| 9 | **Fokus 1–2 kategori untuk rilis pertama** | Contoh UTBK + CPNS. Kategori lain ditambah setelah bank soal siap. |
 
 ---
 
@@ -378,7 +380,7 @@ Penjelasan singkat:
 
 ### Fase 1 — MVP
 1. Setup project (Laravel Boost, Livewire, Inertia + Vue untuk halaman ujian, Tailwind).
-2. Landing page + autentikasi (email & Google).
+2. Landing page + autentikasi (email & password).
 3. Dashboard admin: kategori, materi, bank soal, paket test, pengguna.
 4. Halaman ujian (Inertia + Vue): timer server, autosave, resume, navigasi soal.
 5. Penilaian + halaman hasil + pembahasan.
@@ -392,10 +394,11 @@ Penjelasan singkat:
 - Grafik perkembangan, voucher, notifikasi email.
 - Latihan per topik dari rekomendasi AI.
 
-### Fase 3 — Pertumbuhan
+### Sisa pekerjaan
 - Integrasi payment gateway (Midtrans/Xendit) menggantikan verifikasi manual.
-- Try out nasional terjadwal.
-- Referral, gamifikasi lanjutan, PWA, notifikasi WhatsApp.
+
+### Di luar cakupan
+Try out nasional terjadwal, referral, PWA, notifikasi WhatsApp, log aktivitas admin, dan login Google tidak dikerjakan.
 
 ---
 
