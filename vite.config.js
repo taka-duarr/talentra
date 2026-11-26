@@ -13,6 +13,10 @@ export default defineConfig({
                 bunny('Plus Jakarta Sans', {
                     weights: [400, 500, 600, 700, 800],
                 }),
+                bunny('Instrument Serif', {
+                    weights: [400],
+                    styles: ['normal', 'italic'],
+                }),
             ],
         }),
         tailwindcss(),

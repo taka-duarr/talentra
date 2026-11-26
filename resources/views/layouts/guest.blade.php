@@ -8,25 +8,21 @@
     @fonts
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="min-h-screen font-sans">
-    <div class="grid min-h-screen lg:grid-cols-2">
-        <section class="hidden flex-col justify-between bg-navy-600 p-12 text-white lg:flex">
-            <x-brand class="text-white [&>span]:from-brand-500 [&>span]:to-brand-700" />
-            <div>
-                <p class="text-sm font-bold tracking-widest text-sun-400 uppercase">Tumbuh · Uji · Berkembang</p>
-                <h2 class="mt-4 max-w-md text-4xl leading-tight font-extrabold">Latihan yang terarah dimulai dari tahu kelemahanmu.</h2>
-                <p class="mt-4 max-w-md text-white/70">Kerjakan try out TKA, UTBK, CPNS, BUMN, dan Kedinasan, lalu dapatkan analisis hasil dan rekomendasi belajar.</p>
-            </div>
-            <p class="text-sm text-white/50">© {{ date('Y') }} Talentra</p>
-        </section>
+<body class="auth-body min-h-screen font-sans">
+    <div class="relative flex min-h-screen flex-col px-4 py-5 sm:px-6 lg:px-10">
+        <header class="flex items-center justify-between">
+            <x-brand class="text-white" />
+            <a href="{{ route('login') }}" class="text-sm font-semibold text-white/60 transition hover:text-white">← Kembali ke halaman masuk</a>
+        </header>
 
-        <main class="flex items-center justify-center px-4 py-12">
-            <div class="w-full max-w-md">
-                <div class="mb-8 lg:hidden"><x-brand /></div>
+        <main class="flex flex-1 items-center justify-center py-8">
+            <div class="w-full max-w-md rounded-[28px] bg-[#fbf8f1] p-7 shadow-2xl shadow-black/40 sm:p-10">
                 <x-flash />
                 {{ $slot }}
             </div>
         </main>
+
+        <p class="text-center text-xs text-white/40">© {{ date('Y') }} Talentra · Tumbuh, uji, berkembang.</p>
     </div>
 </body>
 </html>

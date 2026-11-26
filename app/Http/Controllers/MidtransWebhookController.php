@@ -41,7 +41,12 @@ class MidtransWebhookController extends Controller
             return response()->json(['message' => 'Signature tidak valid.'], 403);
         }
 
-        $order = Order::query()->where('code', $orderId)->first();
+        // Each payment attempt has its own Midtrans order_id ("CODE", "CODE-2", ...).
+        $order = Order::query()
+            ->where('gateway_reference', $orderId)
+            ->orWhere('code', $orderId)
+            ->orWhere('code', preg_replace('/-\d+$/', '', (string) $orderId))
+            ->first();
 
         if (! $order) {
             Log::warning('Midtrans webhook order tidak ditemukan', ['order_id' => $orderId]);
@@ -54,15 +59,19 @@ class MidtransWebhookController extends Controller
         $order->payload = $currentPayload;
         $order->save();
 
+        $isCurrentAttempt = blank($order->gateway_reference) || $order->gateway_reference === $orderId;
+
         if ($transactionStatus === 'capture') {
             if ($fraudStatus === 'accept') {
                 $this->orderService->markPaid($order);
             }
         } elseif ($transactionStatus === 'settlement') {
             $this->orderService->markPaid($order);
+        } elseif (! $isCurrentAttempt) {
+            // A replaced attempt being cancelled or expiring says nothing about the order.
         } elseif (in_array($transactionStatus, ['cancel', 'deny'], true)) {
             $this->orderService->cancel($order);
-        } elseif ($transactionStatus === 'expire') {
+        } elseif ($transactionStatus === 'expire' && $order->isPending()) {
             $order->update(['status' => OrderStatus::Expired]);
         }
 

@@ -32,5 +32,10 @@
         <env name="PULSE_ENABLED" value="false"/>
         <env name="TELESCOPE_ENABLED" value="false"/>
         <env name="NIGHTWATCH_ENABLED" value="false"/>
+        <env name="TALENTRA_ANALYSIS_DRIVER" value="rules" force="true"/>
+        <env name="NVIDIA_API_KEY" value="" force="true"/>
+        <env name="ANTHROPIC_API_KEY" value="" force="true"/>
+        <env name="TALENTRA_PAYMENT_GATEWAY" value="manual" force="true"/>
+        <env name="MIDTRANS_SERVER_KEY" value="" force="true"/>
     </php>
 </phpunit>

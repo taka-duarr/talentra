@@ -7,9 +7,8 @@ use App\Http\Controllers\MidtransWebhookController;
 use App\Http\Controllers\PaymentProofController;
 use App\Http\Controllers\PracticeController;
 use App\Livewire\Admin;
+use App\Livewire\Auth\AuthPage;
 use App\Livewire\Auth\ForgotPassword;
-use App\Livewire\Auth\Login;
-use App\Livewire\Auth\Register;
 use App\Livewire\Auth\ResetPassword;
 use App\Livewire\Billing\Checkout;
 use App\Livewire\Billing\OrderShow;
@@ -36,8 +35,8 @@ Route::view('/', 'landing')->name('home');
 Route::post('/midtrans/webhook', MidtransWebhookController::class)->name('midtrans.webhook');
 
 Route::middleware('guest')->group(function () {
-    Route::livewire('/masuk', Login::class)->name('login');
-    Route::livewire('/daftar', Register::class)->name('register');
+    Route::livewire('/masuk', AuthPage::class)->name('login');
+    Route::livewire('/daftar', AuthPage::class)->name('register');
     Route::livewire('/lupa-password', ForgotPassword::class)->name('password.request');
     Route::livewire('/reset-password/{token}', ResetPassword::class)->name('password.reset');
 });
@@ -115,6 +114,8 @@ Route::middleware(['auth', 'not-blocked', 'admin'])->prefix('admin')->name('admi
         Route::livewire('/pesanan', Admin\Orders\OrderIndex::class)->name('orders.index');
         Route::livewire('/pesanan/{order}', Admin\Orders\OrderShow::class)->name('orders.show');
         Route::livewire('/langganan', Admin\Plans::class)->name('plans');
+        Route::livewire('/langganan/buat', Admin\Plans\PlanForm::class)->name('plans.create');
+        Route::livewire('/langganan/{plan}/ubah', Admin\Plans\PlanForm::class)->name('plans.edit');
         Route::livewire('/voucher', Admin\Vouchers::class)->name('vouchers');
         Route::livewire('/pengguna', Admin\Users\UserIndex::class)->name('users.index');
         Route::livewire('/pengguna/{user}', Admin\Users\UserShow::class)->name('users.show');

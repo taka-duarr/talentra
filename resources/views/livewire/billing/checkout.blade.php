@@ -40,7 +40,7 @@
                     @endforeach
                 </div>
                 @if (config('talentra.payments.gateway') === 'midtrans')
-                    <p class="mt-3 text-xs text-subtle">Pembayaran diproses secara instan dan otomatis melalui Midtrans (Sandbox). Langganan akan aktif seketika setelah pembayaran berhasil.</p>
+                    <p class="mt-3 text-xs text-subtle">Bank atau aplikasinya bisa kamu pilih di langkah berikutnya. Pembayaran terkonfirmasi otomatis dan langganan langsung aktif.</p>
                 @else
                     <p class="mt-3 text-xs text-subtle">Pembayaran dilakukan lewat transfer dan diverifikasi admin, biasanya kurang dari 1×24 jam.</p>
                 @endif

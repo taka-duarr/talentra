@@ -43,15 +43,38 @@
         </section>
 
         <section class="card p-5">
-            <h2 class="font-bold">Bukti pembayaran</h2>
-            @if ($order->proof_path)
-                <p class="mt-1 text-xs text-subtle">Diunggah {{ $order->proof_uploaded_at?->translatedFormat('d M Y H:i') }}</p>
-                @if ($isImage)
-                    <img src="{{ route('orders.proof', $order) }}" alt="Bukti pembayaran {{ $order->code }}" class="mt-4 max-h-[520px] w-full rounded-xl border border-line object-contain">
-                @endif
-                <a href="{{ route('orders.proof', $order) }}" target="_blank" class="btn btn-outline btn-sm mt-3">Buka file</a>
+            @if ($order->gateway === 'midtrans' && ! $order->proof_path)
+                <h2 class="font-bold">Pembayaran Midtrans</h2>
+                <dl class="mt-3 space-y-3 text-sm">
+                    <div>
+                        <dt class="text-subtle">Gateway</dt>
+                        <dd class="font-semibold">Midtrans (otomatis)</dd>
+                    </div>
+                    @if ($order->gateway_reference)
+                        <div>
+                            <dt class="text-subtle">Referensi / Snap Token</dt>
+                            <dd class="break-all font-mono text-xs">{{ $order->gateway_reference }}</dd>
+                        </div>
+                    @endif
+                    @if ($order->paid_at)
+                        <div>
+                            <dt class="text-subtle">Waktu pembayaran</dt>
+                            <dd>{{ $order->paid_at->translatedFormat('d M Y H:i') }}</dd>
+                        </div>
+                    @endif
+                </dl>
+                <p class="mt-4 text-xs text-subtle">Pesanan melalui Midtrans diverifikasi otomatis tanpa unggah bukti transfer manual.</p>
             @else
-                <p class="mt-3 text-sm text-muted">Pembeli belum mengunggah bukti pembayaran.</p>
+                <h2 class="font-bold">Bukti pembayaran</h2>
+                @if ($order->proof_path)
+                    <p class="mt-1 text-xs text-subtle">Diunggah {{ $order->proof_uploaded_at?->translatedFormat('d M Y H:i') }}</p>
+                    @if ($isImage)
+                        <img src="{{ route('orders.proof', $order) }}" alt="Bukti pembayaran {{ $order->code }}" class="mt-4 max-h-[520px] w-full rounded-xl border border-line object-contain">
+                    @endif
+                    <a href="{{ route('orders.proof', $order) }}" target="_blank" class="btn btn-outline btn-sm mt-3">Buka file</a>
+                @else
+                    <p class="mt-3 text-sm text-muted">Pembeli belum mengunggah bukti pembayaran.</p>
+                @endif
             @endif
         </section>
     </div>

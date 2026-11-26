@@ -1,64 +1,141 @@
-@php use App\Support\Money; @endphp
-<div>
-    <x-page-header title="Paket langganan" description="Harga per durasi. Paket nonaktif tidak tampil ke pengguna, tetapi langganan yang sudah berjalan tetap berlaku." />
+@php
+    use App\Support\Money;
+    use Illuminate\Support\Js;
+@endphp
+<div x-data="{ activePlan: null }" @keydown.escape.window="activePlan = null">
+    <x-page-header title="Paket langganan" description="Harga per durasi. Paket nonaktif tidak tampil ke pengguna, tetapi langganan yang sudah berjalan tetap berlaku.">
+        <x-slot:actions>
+            <a href="{{ route('admin.plans.create') }}" wire:navigate class="btn btn-primary">+ Paket baru</a>
+        </x-slot:actions>
+    </x-page-header>
 
-    <div class="grid gap-6 lg:grid-cols-[1fr_380px]">
-        <div class="card overflow-hidden">
-            <table class="table-base">
-                <thead><tr><th>Paket</th><th>Membuka</th><th>Harga</th><th></th></tr></thead>
+    <div class="card overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="table-base text-[15px] [&_td]:py-4 [&_th]:py-3.5 [&_th]:text-[13px]">
+                <thead>
+                    <tr>
+                        <th>Paket</th>
+                        <th>Membuka</th>
+                        <th>Daftar Harga</th>
+                        <th>Status</th>
+                        <th></th>
+                    </tr>
+                </thead>
                 <tbody>
-                    @foreach ($plans as $plan)
+                    @forelse ($plans as $plan)
+                        @php
+                            $planPayload = [
+                                'name' => $plan->name,
+                                'access' => $plan->is_all_access ? 'Semua kategori' : $plan->categories->pluck('name')->join(', '),
+                                'editUrl' => route('admin.plans.edit', $plan),
+                                'prices' => $plan->prices->map(fn ($price) => [
+                                    'duration' => $price->durationLabel(),
+                                    'price' => Money::rupiah($price->price),
+                                    'compareAt' => ($price->compare_at_price && $price->compare_at_price > $price->price)
+                                        ? Money::rupiah($price->compare_at_price)
+                                        : null,
+                                    'monthly' => Money::rupiah($price->monthlyPrice()).'/bln',
+                                ])->values()->all(),
+                            ];
+                        @endphp
                         <tr wire:key="plan-{{ $plan->id }}">
-                            <td class="font-semibold">{{ $plan->name }} @unless ($plan->is_active) <span class="badge bg-navy-50 text-muted">Nonaktif</span> @endunless</td>
-                            <td class="text-xs text-muted">{{ $plan->is_all_access ? 'Semua kategori' : $plan->categories->pluck('name')->join(', ') }}</td>
-                            <td class="text-xs">@foreach ($plan->prices as $price) <span class="block">{{ $price->durationLabel() }}: {{ Money::rupiah($price->price) }}</span> @endforeach</td>
-                            <td class="text-right"><button type="button" wire:click="edit({{ $plan->id }})" class="btn btn-ghost btn-sm">Ubah</button></td>
+                            <td>
+                                <span class="text-base font-bold text-ink">{{ $plan->name }}</span>
+                                @if ($plan->description)
+                                    <span class="mt-0.5 block text-sm text-muted">{{ $plan->description }}</span>
+                                @endif
+                            </td>
+                            <td class="text-sm font-medium text-muted">
+                                {{ $plan->is_all_access ? 'Semua kategori' : $plan->categories->pluck('name')->join(', ') }}
+                            </td>
+                            <td class="whitespace-nowrap">
+                                <button
+                                    type="button"
+                                    x-on:click="activePlan = {{ Js::from($planPayload) }}"
+                                    class="btn btn-outline btn-sm text-sm"
+                                >
+                                    Lihat harga ({{ $plan->prices->count() }})
+                                </button>
+                            </td>
+                            <td>
+                                <button
+                                    type="button"
+                                    wire:click="toggleActive({{ $plan->id }})"
+                                    class="badge cursor-pointer px-3 py-1 text-sm {{ $plan->is_active ? 'bg-brand-50 text-brand-700' : 'bg-navy-50 text-muted' }}"
+                                >
+                                    {{ $plan->is_active ? 'Aktif' : 'Nonaktif' }}
+                                </button>
+                            </td>
+                            <td class="text-right whitespace-nowrap">
+                                <a href="{{ route('admin.plans.edit', $plan) }}" wire:navigate class="btn btn-ghost btn-sm text-sm">Ubah</a>
+                                <button type="button" wire:click="delete({{ $plan->id }})" wire:confirm="Hapus paket {{ $plan->name }}?" class="btn btn-ghost btn-sm text-sm text-coral-600">Hapus</button>
+                            </td>
                         </tr>
-                    @endforeach
+                    @empty
+                        <tr>
+                            <td colspan="5" class="py-10 text-center text-base text-muted">Belum ada paket langganan.</td>
+                        </tr>
+                    @endforelse
                 </tbody>
             </table>
         </div>
-
-        <form wire:submit="save" class="card h-fit space-y-4 p-5">
-            <div class="flex items-center justify-between">
-                <h2 class="font-bold">{{ $editingId ? 'Ubah paket' : 'Paket baru' }}</h2>
-                @if ($editingId) <button type="button" wire:click="resetForm" class="text-xs font-semibold text-muted">Batal</button> @endif
-            </div>
-            <div><label class="field-label" for="plan-name">Nama</label><input id="plan-name" type="text" wire:model="form.name" class="field">@error('form.name') <p class="field-error">{{ $message }}</p> @enderror</div>
-            <div><label class="field-label" for="plan-desc">Deskripsi</label><input id="plan-desc" type="text" wire:model="form.description" class="field"></div>
-            <label class="flex items-center gap-2 text-sm"><input type="checkbox" wire:model.live="form.is_all_access" class="size-4 rounded border-line text-brand-600"> Semua Akses (membuka semua kategori)</label>
-            @unless ($form['is_all_access'])
-                <fieldset>
-                    <legend class="field-label">Kategori yang dibuka</legend>
-                    <div class="grid grid-cols-2 gap-1.5">
-                        @foreach ($categories as $category)
-                            <label class="flex items-center gap-2 text-sm"><input type="checkbox" wire:model="categoryIds" value="{{ $category->id }}" class="size-4 rounded border-line text-brand-600"> {{ $category->name }}</label>
-                        @endforeach
-                    </div>
-                    @error('categoryIds') <p class="field-error">{{ $message }}</p> @enderror
-                </fieldset>
-            @endunless
-            <fieldset>
-                <legend class="field-label">Harga per durasi</legend>
-                <div class="space-y-2">
-                    @foreach ($prices as $index => $price)
-                        <div wire:key="price-{{ $index }}" class="grid grid-cols-[70px_1fr_1fr_auto] items-center gap-2">
-                            <input type="number" min="1" wire:model="prices.{{ $index }}.months" class="field px-2 py-1.5" placeholder="Bln" aria-label="Durasi bulan">
-                            <input type="number" min="0" wire:model="prices.{{ $index }}.price" class="field px-2 py-1.5" placeholder="Harga" aria-label="Harga">
-                            <input type="number" min="0" wire:model="prices.{{ $index }}.compare_at_price" class="field px-2 py-1.5" placeholder="Harga coret" aria-label="Harga coret">
-                            <button type="button" wire:click="removePrice({{ $index }})" class="text-subtle hover:text-coral-600" aria-label="Hapus harga">✕</button>
-                        </div>
-                        @error('prices.'.$index.'.months') <p class="field-error">{{ $message }}</p> @enderror
-                        @error('prices.'.$index.'.price') <p class="field-error">{{ $message }}</p> @enderror
-                    @endforeach
-                </div>
-                <button type="button" wire:click="addPrice" class="btn btn-ghost btn-sm mt-2">+ Durasi</button>
-            </fieldset>
-            <div class="flex items-center gap-4">
-                <label class="flex items-center gap-2 text-sm"><input type="checkbox" wire:model="form.is_active" class="size-4 rounded border-line text-brand-600"> Aktif</label>
-                <label class="flex items-center gap-2 text-sm">Urutan <input type="number" min="0" wire:model="form.sort_order" class="field w-20 py-1.5"></label>
-            </div>
-            <button type="submit" class="btn btn-primary w-full">Simpan paket</button>
-        </form>
     </div>
+
+    {{-- Modal daftar harga --}}
+    <template x-teleport="body">
+        <div
+            x-cloak
+            x-show="activePlan !== null"
+            x-transition.opacity
+            class="fixed inset-0 z-50 flex items-center justify-center bg-ink/40 p-4 backdrop-blur-xs"
+            x-on:click.self="activePlan = null"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="price-modal-title"
+        >
+            <div
+                x-show="activePlan !== null"
+                x-transition
+                class="w-full max-w-md overflow-hidden rounded-2xl border border-line bg-white shadow-2xl"
+            >
+                <div class="flex items-start justify-between gap-4 border-b border-line px-5 py-4">
+                    <div>
+                        <h2 id="price-modal-title" class="text-lg font-extrabold text-ink" x-text="activePlan?.name"></h2>
+                        <p class="mt-0.5 text-sm text-muted" x-text="'Membuka: ' + (activePlan?.access ?? '')"></p>
+                    </div>
+                    <button
+                        type="button"
+                        x-on:click="activePlan = null"
+                        class="grid size-8 flex-none place-items-center rounded-lg text-lg text-subtle hover:bg-navy-50 hover:text-ink"
+                        aria-label="Tutup popup"
+                    >
+                        ×
+                    </button>
+                </div>
+
+                <div class="divide-y divide-line px-5">
+                    <template x-for="(item, idx) in (activePlan?.prices ?? [])" :key="idx">
+                        <div class="flex items-center justify-between gap-4 py-3.5">
+                            <div>
+                                <p class="text-base font-bold text-ink" x-text="item.duration"></p>
+                                <p class="text-sm text-muted" x-text="item.monthly"></p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-base font-extrabold text-ink" x-text="item.price"></p>
+                                <p x-show="item.compareAt" class="text-sm text-subtle line-through" x-text="item.compareAt"></p>
+                            </div>
+                        </div>
+                    </template>
+                    <p x-show="activePlan && activePlan.prices.length === 0" class="py-6 text-center text-sm text-muted">
+                        Belum ada daftar harga.
+                    </p>
+                </div>
+
+                <div class="flex items-center justify-end gap-2 border-t border-line bg-canvas/60 px-5 py-3.5">
+                    <a :href="activePlan?.editUrl" wire:navigate x-on:click="activePlan = null" class="btn btn-outline btn-sm text-sm">Ubah harga</a>
+                    <button type="button" x-on:click="activePlan = null" class="btn btn-primary btn-sm text-sm">Tutup</button>
+                </div>
+            </div>
+        </div>
+    </template>
 </div>

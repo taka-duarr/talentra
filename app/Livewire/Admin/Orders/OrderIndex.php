@@ -18,7 +18,7 @@ class OrderIndex extends Component
     use WithPagination;
 
     #[Url]
-    public string $status = 'perlu-verifikasi';
+    public string $status = '';
 
     #[Url(as: 'cari')]
     public string $search = '';
@@ -31,7 +31,7 @@ class OrderIndex extends Component
     public function render(): View
     {
         $orders = Order::query()
-            ->with(['user', 'plan'])
+            ->with(['user', 'plan', 'voucher', 'subscription'])
             ->when($this->status === 'perlu-verifikasi', fn ($query) => $query->where('status', OrderStatus::Pending)->whereNotNull('proof_path'))
             ->when(! in_array($this->status, ['', 'perlu-verifikasi'], true), fn ($query) => $query->where('status', $this->status))
             ->when($this->search !== '', fn ($query) => $query->where(fn ($inner) => $inner

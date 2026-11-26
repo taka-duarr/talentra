@@ -40,6 +40,14 @@ return [
             'max_tokens' => 1500,
             'timeout' => 45,
         ],
+        // NVIDIA NIM (build.nvidia.com). Models are tried in order; the rest are fallbacks.
+        'nvidia' => [
+            'api_key' => env('NVIDIA_API_KEY'),
+            'base_url' => env('NVIDIA_BASE_URL', 'https://integrate.api.nvidia.com/v1'),
+            'models' => explode(',', (string) env('TALENTRA_NVIDIA_MODELS', 'minimaxai/minimax-m3.1-flash,nvidia/nemotron-3-ultra-550b-a55b')),
+            'max_tokens' => 2500,
+            'timeout' => 90,
+        ],
         'daily_limit_per_user' => (int) env('TALENTRA_ANALYSIS_DAILY_LIMIT', 10),
         // true: run on the queue (needs `php artisan queue:work`). false: run right after the response.
         'use_queue' => (bool) env('TALENTRA_ANALYSIS_QUEUE', false),

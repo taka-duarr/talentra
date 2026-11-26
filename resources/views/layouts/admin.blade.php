@@ -42,28 +42,28 @@
 
     <div x-data="{ menuOpen: false }" class="flex w-full gap-3 p-2 sm:p-3 lg:gap-4 lg:p-4">
         {{-- Icon rail --}}
-        <aside class="glass sticky top-4 z-30 hidden h-[calc(100vh-2rem)] w-[76px] flex-none flex-col items-center rounded-[28px] py-5 lg:flex" aria-label="Navigasi admin">
-            <a href="{{ route('admin.dashboard') }}" wire:navigate class="grid size-11 place-items-center rounded-2xl bg-gradient-to-br from-navy-500 to-navy-700 text-white shadow-lg shadow-navy-600/30" aria-label="Ringkasan admin">
-                <x-icon name="shield" class="size-6" />
+        <aside class="glass sticky top-4 z-30 hidden min-h-[calc(100vh-2rem)] w-[72px] flex-none self-start flex-col items-center rounded-[28px] py-3.5 lg:flex" aria-label="Navigasi admin">
+            <a href="{{ route('admin.dashboard') }}" wire:navigate class="grid size-10 flex-none place-items-center rounded-2xl bg-gradient-to-br from-navy-500 to-navy-700 text-white shadow-lg shadow-navy-600/30" aria-label="Ringkasan admin">
+                <x-icon name="shield" class="size-5" />
             </a>
-            <nav class="mt-6 flex flex-1 flex-col items-center gap-1.5">
+            <nav class="mt-4 flex flex-1 flex-col items-center gap-1">
                 @foreach ($groups as $group => $items)
                     @unless ($loop->first)
-                        <span class="my-1.5 h-px w-8 bg-navy-100" aria-hidden="true"></span>
+                        <span class="my-1 h-px w-7 bg-navy-100" aria-hidden="true"></span>
                     @endunless
                     @foreach ($items as [$label, $route, $pattern, $icon])
-                        <a href="{{ route($route) }}" wire:navigate class="rail-link" @if (request()->routeIs($pattern)) aria-current="page" @endif>
-                            <x-icon :name="$icon" />
+                        <a href="{{ route($route) }}" wire:navigate class="rail-link size-9 rounded-xl" @if (request()->routeIs($pattern)) aria-current="page" @endif>
+                            <x-icon :name="$icon" class="size-[18px]" />
                             <span class="rail-tip">{{ $group }} · {{ $label }}</span>
                             <span class="sr-only">{{ $label }}</span>
                         </a>
                     @endforeach
                 @endforeach
             </nav>
-            <form method="POST" action="{{ route('logout') }}" class="mt-2">
+            <form method="POST" action="{{ route('logout') }}" class="mt-2 flex-none">
                 @csrf
-                <button type="submit" class="rail-link hover:text-coral-600">
-                    <x-icon name="logout" />
+                <button type="submit" class="rail-link size-9 rounded-xl hover:text-coral-600">
+                    <x-icon name="logout" class="size-[18px]" />
                     <span class="rail-tip">Keluar</span>
                     <span class="sr-only">Keluar</span>
                 </button>

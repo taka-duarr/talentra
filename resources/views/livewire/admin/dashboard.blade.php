@@ -3,7 +3,7 @@
     $maxRevenue = max(1, $revenueChart->max('value'));
     $cards = array_values(array_filter([
         $isSuper ? ['Pendapatan bulan ini', $stats['revenueThisMonth'], 'receipt', 'bg-brand-50 text-brand-700', true, null] : null,
-        $isSuper ? ['Pesanan perlu verifikasi', $stats['pendingOrders'], 'card', 'bg-sun-100 text-sun-600', false, route('admin.orders.index')] : null,
+        $isSuper ? ['Pesanan perlu verifikasi', $stats['pendingOrders'], 'card', 'bg-sun-100 text-sun-600', false, route('admin.orders.index', ['status' => 'perlu-verifikasi'])] : null,
         ['Pelanggan aktif', $stats['activeSubscribers'], 'users', 'bg-sky-100 text-sky-600', false, null],
         ['Pengguna baru (30 hari)', $stats['newUsers'], 'user', 'bg-navy-50 text-navy-600', false, null],
         ['Try out selesai hari ini', $stats['attemptsToday'], 'clipboard', 'bg-coral-100 text-coral-600', false, route('admin.attempts.index', ['periode' => '1'])],
@@ -67,8 +67,10 @@
                     @foreach ($revenueChart as $index => $bar)
                         <div class="group flex h-full flex-1 flex-col items-center justify-end gap-2">
                             <span class="rounded-md bg-navy-600 px-1.5 py-0.5 text-[10px] font-bold text-white opacity-0 transition group-hover:opacity-100">{{ Money::rupiahShort($bar['value']) }}</span>
-                            <div @class(['grow-bar w-full max-w-14 rounded-xl', 'bg-gradient-to-t from-brand-600 to-brand-500' => $loop->last, 'bg-gradient-to-t from-navy-100 to-navy-50 group-hover:from-brand-100 group-hover:to-brand-50' => ! $loop->last])
-                                 style="height: {{ max(4, $bar['value'] / $maxRevenue * 100) }}%; --i: {{ $index }}"></div>
+                            <div class="flex min-h-0 w-full flex-1 items-end justify-center">
+                                <div @class(['grow-bar w-full max-w-14 rounded-xl', 'bg-gradient-to-t from-brand-600 to-brand-500' => $loop->last, 'bg-gradient-to-t from-navy-100 to-navy-50 group-hover:from-brand-100 group-hover:to-brand-50' => ! $loop->last])
+                                     style="height: {{ max(4, $bar['value'] / $maxRevenue * 100) }}%; --i: {{ $index }}"></div>
+                            </div>
                             <span class="text-xs text-subtle">{{ $bar['label'] }}</span>
                         </div>
                     @endforeach

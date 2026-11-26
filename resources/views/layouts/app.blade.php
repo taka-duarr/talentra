@@ -34,7 +34,7 @@
 
     <div class="flex w-full gap-3 p-2 pb-28 sm:p-3 sm:pb-28 lg:gap-4 lg:p-4">
         {{-- Icon rail --}}
-        <aside class="glass sticky top-4 hidden h-[calc(100vh-2rem)] w-[76px] flex-none flex-col items-center rounded-[28px] py-5 lg:flex" aria-label="Navigasi utama">
+        <aside class="glass sticky top-4 z-30 hidden min-h-[calc(100vh-2rem)] w-[76px] flex-none self-start flex-col items-center rounded-[28px] py-5 lg:flex" aria-label="Navigasi utama">
             <a href="{{ route('dashboard') }}" wire:navigate class="grid size-11 place-items-center rounded-2xl bg-gradient-to-br from-brand-500 to-navy-600 text-white shadow-lg shadow-brand-500/30" aria-label="Talentra, ke beranda">
                 <svg class="size-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h11"/><path d="M9.5 6v13"/><path d="m14 15 5-5"/><path d="M15.5 10H19v3.5"/></svg>
             </a>
@@ -68,7 +68,7 @@
 
         {{-- Main glass panel --}}
         <div class="glass min-w-0 flex-1 rounded-[28px] p-4 sm:p-6 lg:p-8">
-            <header class="mb-7 flex items-center gap-3">
+            <header class="relative z-40 mb-7 flex items-center gap-3">
                 <a href="{{ route('dashboard') }}" wire:navigate class="grid size-10 flex-none place-items-center rounded-xl bg-gradient-to-br from-brand-500 to-navy-600 text-white lg:hidden" aria-label="Talentra, ke beranda">
                     <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6h11"/><path d="M9.5 6v13"/><path d="m14 15 5-5"/><path d="M15.5 10H19v3.5"/></svg>
                 </a>

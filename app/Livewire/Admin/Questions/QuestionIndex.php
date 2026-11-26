@@ -58,7 +58,7 @@ class QuestionIndex extends Component
     public function render(): View
     {
         $questions = Question::query()
-            ->with(['subject.category', 'topic'])
+            ->with(['subject.category', 'topic', 'options'])
             ->withCount('sections')
             ->when($this->category !== '', fn ($query) => $query->whereHas('subject', fn ($subject) => $subject->where('category_id', $this->category)))
             ->when($this->status !== '', fn ($query) => $query->where('status', $this->status))

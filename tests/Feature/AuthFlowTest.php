@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Livewire\Auth\AuthPage;
 use App\Livewire\Auth\Login;
 use App\Livewire\Auth\Register;
 use App\Models\Category;
@@ -17,6 +18,21 @@ class AuthFlowTest extends TestCase
     public function test_guest_is_redirected_to_login(): void
     {
         $this->get(route('dashboard'))->assertRedirect(route('login'));
+    }
+
+    public function test_login_and_register_urls_share_one_card_in_the_right_mode(): void
+    {
+        $this->get(route('login'))
+            ->assertOk()
+            ->assertSeeLivewire(AuthPage::class)
+            ->assertSee('data-mode="login"', false)
+            ->assertSee('login-email', false)
+            ->assertSee('register-email', false);
+
+        $this->get(route('register'))
+            ->assertOk()
+            ->assertSee('data-mode="register"', false)
+            ->assertSee('<title>Daftar · Talentra</title>', false);
     }
 
     public function test_user_can_register_with_target_exam(): void
