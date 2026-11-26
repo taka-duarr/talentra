@@ -42,10 +42,17 @@ class QuestionForm extends Component
     /** @var array<int, array{body: string, is_correct: bool, weight: int}> */
     public array $options = [];
 
+    public string $courseSlug = '';
+
     public function mount(?Question $question = null): void
     {
+        $this->courseSlug = (string) request()->query('kursus', '');
+
         if ($question?->exists) {
-            $this->question = $question->load('options');
+            $this->question = $question->load(['options', 'subject.category']);
+            if ($this->courseSlug === '') {
+                $this->courseSlug = $this->question->subject->category->slug;
+            }
             $this->fill([
                 'subject_id' => $question->subject_id,
                 'topic_id' => $question->topic_id,
@@ -198,8 +205,15 @@ class QuestionForm extends Component
 
     public function render(): View
     {
+        $course = $this->courseSlug !== '' ? Category::query()->where('slug', $this->courseSlug)->first() : null;
+
         return view('livewire.admin.questions.form', [
-            'categories' => Category::query()->ordered()->with('subjects')->get(),
+            'course' => $course,
+            'categories' => Category::query()
+                ->when($course, fn ($query) => $query->whereKey($course->id))
+                ->ordered()
+                ->with('subjects')
+                ->get(),
             'types' => QuestionType::cases(),
             'statuses' => ContentStatus::cases(),
             'bodyPreview' => Html::clean($this->body),

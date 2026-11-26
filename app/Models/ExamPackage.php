@@ -6,6 +6,7 @@ use App\Enums\ContentStatus;
 use Database\Factories\ExamPackageFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -114,5 +115,54 @@ class ExamPackage extends Model
     public function hasAttemptsLeftFor(User $user): bool
     {
         return $this->max_attempts === null || $this->attemptsUsedBy($user) < $this->max_attempts;
+    }
+
+    /**
+     * Published materials in this course that the user must finish before starting this try out.
+     *
+     * @return EloquentCollection<int, Material>
+     */
+    public function prerequisiteMaterialsFor(User $user): EloquentCollection
+    {
+        if ($this->is_practice) {
+            return new EloquentCollection;
+        }
+
+        $hasFullAccess = $user->canAccessCategory($this->category_id);
+
+        return Material::query()
+            ->published()
+            ->select('materials.*')
+            ->join('chapters', 'chapters.id', '=', 'materials.chapter_id')
+            ->join('subjects', 'subjects.id', '=', 'chapters.subject_id')
+            ->where('subjects.category_id', $this->category_id)
+            ->when(! $hasFullAccess, fn (Builder $query) => $query->where('materials.is_free', true))
+            ->orderBy('subjects.sort_order')
+            ->orderBy('chapters.sort_order')
+            ->orderBy('materials.sort_order')
+            ->get();
+    }
+
+    /**
+     * @return EloquentCollection<int, Material>
+     */
+    public function uncompletedMaterialsFor(User $user): EloquentCollection
+    {
+        $required = $this->prerequisiteMaterialsFor($user);
+
+        if ($required->isEmpty()) {
+            return $required;
+        }
+
+        $completedIds = $user->materialProgress()
+            ->whereIn('material_id', $required->pluck('id'))
+            ->pluck('material_id');
+
+        return $required->reject(fn (Material $material) => $completedIds->contains($material->id))->values();
+    }
+
+    public function arePrerequisitesMetBy(User $user): bool
+    {
+        return $this->is_practice || $this->uncompletedMaterialsFor($user)->isEmpty();
     }
 }

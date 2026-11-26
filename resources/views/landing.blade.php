@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Talentra — Tumbuh · Uji · Berkembang</title>
+<x-favicon />
 <meta name="description" content="Talentra: satu tempat belajar dan berlatih TKA SD, SMP, SMA, UTBK-SNBT, CPNS, BUMN, dan Kedinasan, lengkap dengan analisis hasil AI dan rekomendasi belajar.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

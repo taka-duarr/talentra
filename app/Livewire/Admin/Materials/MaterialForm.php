@@ -32,13 +32,28 @@ class MaterialForm extends Component
 
     public bool $is_published = true;
 
+    public string $courseSlug = '';
+
     public function mount(?Material $material = null): void
     {
+        $this->courseSlug = (string) request()->query('kursus', '');
+
         if ($material?->exists) {
+            $material->loadMissing('chapter.subject.category');
             $this->material = $material;
             $this->fill($material->only(['chapter_id', 'title', 'slug', 'content', 'is_free', 'sort_order']));
             $this->video_url = (string) $material->video_url;
             $this->is_published = $material->published_at !== null;
+            if ($this->courseSlug === '') {
+                $this->courseSlug = $material->chapter->subject->category->slug;
+            }
+
+            return;
+        }
+
+        $chapterId = (int) request()->query('bab', 0);
+        if ($chapterId > 0) {
+            $this->chapter_id = $chapterId;
         }
     }
 
@@ -73,13 +88,27 @@ class MaterialForm extends Component
             : $this->material = Material::create($attributes);
 
         session()->flash('status', 'Materi disimpan.');
+
+        if ($this->courseSlug !== '') {
+            $this->redirectRoute('admin.courses.show', ['category' => $this->courseSlug, 'tab' => 'kurikulum'], navigate: true);
+
+            return;
+        }
+
         $this->redirectRoute('admin.materials.edit', $this->material, navigate: true);
     }
 
     public function render(): View
     {
+        $course = $this->courseSlug !== '' ? Category::query()->where('slug', $this->courseSlug)->first() : null;
+
         return view('livewire.admin.materials.form', [
-            'categories' => Category::query()->ordered()->with('subjects.chapters')->get(),
+            'course' => $course,
+            'categories' => Category::query()
+                ->when($course, fn ($query) => $query->whereKey($course->id))
+                ->ordered()
+                ->with('subjects.chapters')
+                ->get(),
             'preview' => Html::clean($this->content),
         ])->title($this->material ? 'Ubah materi' : 'Materi baru');
     }

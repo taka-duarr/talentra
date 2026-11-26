@@ -91,6 +91,8 @@ Route::middleware(['auth', 'not-blocked', 'admin'])->prefix('admin')->name('admi
     Route::livewire('/', Admin\AdminDashboard::class)->name('dashboard');
     Route::livewire('/hasil', Admin\Attempts\AttemptIndex::class)->name('attempts.index');
     Route::livewire('/hasil/{attempt}', Admin\Attempts\AttemptShow::class)->name('attempts.show');
+    Route::livewire('/kursus', Admin\Courses\CourseIndex::class)->name('courses.index');
+    Route::livewire('/kursus/{category}', Admin\Courses\CourseShow::class)->name('courses.show');
     Route::livewire('/kategori', Admin\Catalog::class)->name('categories');
 
     Route::livewire('/materi', Admin\Materials\MaterialIndex::class)->name('materials.index');

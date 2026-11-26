@@ -1,5 +1,9 @@
 <div>
-    <a href="{{ route('admin.materials.index') }}" wire:navigate class="text-sm font-semibold text-muted hover:text-ink">← Semua materi</a>
+    @if ($course)
+        <a href="{{ route('admin.courses.show', ['category' => $course, 'tab' => 'kurikulum']) }}" wire:navigate class="text-sm font-semibold text-muted hover:text-ink">← Kurikulum {{ $course->name }}</a>
+    @else
+        <a href="{{ route('admin.courses.index') }}" wire:navigate class="text-sm font-semibold text-muted hover:text-ink">← Semua kursus</a>
+    @endif
     <h1 class="mt-3 mb-6 text-2xl font-extrabold tracking-tight">{{ $material ? 'Ubah materi' : 'Materi baru' }}</h1>
 
     <form wire:submit="save" class="grid gap-6 lg:grid-cols-[1fr_300px]">
@@ -45,7 +49,7 @@
                     @endforeach
                 </select>
                 @error('chapter_id') <p class="field-error">{{ $message }}</p> @enderror
-                <p class="mt-1 text-xs text-subtle">Belum ada babnya? Tambahkan di <a href="{{ route('admin.categories') }}" wire:navigate class="font-semibold text-brand-700">Kategori & mata uji</a>.</p>
+                <p class="mt-1 text-xs text-subtle">Belum ada babnya? Tambahkan di <a href="{{ $course ? route('admin.courses.show', ['category' => $course, 'tab' => 'kurikulum']) : route('admin.courses.index') }}" wire:navigate class="font-semibold text-brand-700">halaman kurikulum kursus</a>.</p>
             </div>
             <div>
                 <label for="video" class="field-label">Video (YouTube/Vimeo, opsional)</label>

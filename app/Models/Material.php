@@ -70,6 +70,18 @@ class Material extends Model
         return $user !== null && $user->canAccessCategory($this->categoryId());
     }
 
+    public function readingMinutes(): int
+    {
+        $words = str_word_count(strip_tags((string) $this->content));
+
+        return max(2, (int) ceil($words / 160));
+    }
+
+    public function kindLabel(): string
+    {
+        return $this->video_url ? 'Video' : 'Bacaan';
+    }
+
     /**
      * Converts a YouTube/Vimeo link into an embeddable URL.
      */

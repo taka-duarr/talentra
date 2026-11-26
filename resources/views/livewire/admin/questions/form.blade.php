@@ -1,6 +1,10 @@
 @php $letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']; @endphp
 <div>
-    <a href="{{ route('admin.questions.index') }}" wire:navigate class="text-sm font-semibold text-muted hover:text-ink">← Bank soal</a>
+    @if ($course)
+        <a href="{{ route('admin.courses.show', ['category' => $course, 'tab' => 'soal']) }}" wire:navigate class="text-sm font-semibold text-muted hover:text-ink">← Bank soal {{ $course->name }}</a>
+    @else
+        <a href="{{ route('admin.courses.index') }}" wire:navigate class="text-sm font-semibold text-muted hover:text-ink">← Semua kursus</a>
+    @endif
     <h1 class="mt-3 mb-6 text-2xl font-extrabold tracking-tight">{{ $question ? 'Ubah soal #'.$question->id : 'Soal baru' }}</h1>
 
     <form wire:submit="save" class="grid gap-6 lg:grid-cols-[1fr_300px]">

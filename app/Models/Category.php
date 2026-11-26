@@ -65,6 +65,14 @@ class Category extends Model
     }
 
     /**
+     * @return HasManyThrough<Question, Subject, $this>
+     */
+    public function questions(): HasManyThrough
+    {
+        return $this->hasManyThrough(Question::class, Subject::class);
+    }
+
+    /**
      * @return HasMany<ExamPackage, $this>
      */
     public function examPackages(): HasMany

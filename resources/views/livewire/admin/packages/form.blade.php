@@ -1,5 +1,9 @@
 <div>
-    <a href="{{ route('admin.packages.index') }}" wire:navigate class="text-sm font-semibold text-muted hover:text-ink">← Paket try out</a>
+    @if ($course)
+        <a href="{{ route('admin.courses.show', ['category' => $course, 'tab' => 'tryout']) }}" wire:navigate class="text-sm font-semibold text-muted hover:text-ink">← Try Out {{ $course->name }}</a>
+    @else
+        <a href="{{ route('admin.courses.index') }}" wire:navigate class="text-sm font-semibold text-muted hover:text-ink">← Semua kursus</a>
+    @endif
     <h1 class="mt-3 mb-6 text-2xl font-extrabold tracking-tight">{{ $package ? $package->title : 'Paket baru' }}</h1>
 
     <form wire:submit="save" class="card grid gap-4 p-5 md:grid-cols-3">

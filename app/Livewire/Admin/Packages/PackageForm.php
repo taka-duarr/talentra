@@ -45,13 +45,30 @@ class PackageForm extends Component
 
     public string $questionSearch = '';
 
+    public string $courseSlug = '';
+
     public function mount(?ExamPackage $package = null): void
     {
+        $this->courseSlug = (string) request()->query('kursus', '');
+
         if ($package?->exists) {
+            $package->loadMissing('category');
             $this->package = $package;
             $this->form = array_merge($this->form, $package->only(array_keys($this->form)));
             $this->form['status'] = $package->status->value;
             $this->activeSectionId = $package->sections()->value('id');
+            if ($this->courseSlug === '') {
+                $this->courseSlug = $package->category->slug;
+            }
+
+            return;
+        }
+
+        if ($this->courseSlug !== '') {
+            $course = Category::query()->where('slug', $this->courseSlug)->first();
+            if ($course) {
+                $this->form['category_id'] = $course->id;
+            }
         }
     }
 
@@ -191,7 +208,12 @@ class PackageForm extends Component
 
     public function render(): View
     {
+        $course = $this->courseSlug !== ''
+            ? Category::query()->where('slug', $this->courseSlug)->first()
+            : $this->package?->category;
+
         return view('livewire.admin.packages.form', [
+            'course' => $course,
             'categories' => Category::query()->ordered()->get(['id', 'name']),
             'subjects' => $this->package ? $this->package->category->subjects : collect(),
             'statuses' => ContentStatus::cases(),

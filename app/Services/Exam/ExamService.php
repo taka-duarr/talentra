@@ -49,6 +49,14 @@ class ExamService
             throw ValidationException::withMessages(['package' => 'Kesempatan mengerjakan paket ini sudah habis.']);
         }
 
+        if (! $package->arePrerequisitesMetBy($user)) {
+            $remaining = $package->uncompletedMaterialsFor($user)->count();
+
+            throw ValidationException::withMessages([
+                'package' => "Selesaikan {$remaining} materi kursus terlebih dahulu sebelum mengerjakan try out ini.",
+            ]);
+        }
+
         // Only one exam may run at a time per user.
         $otherRunning = ExamAttempt::query()
             ->where('user_id', $user->id)

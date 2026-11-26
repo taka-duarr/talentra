@@ -23,9 +23,15 @@ class TryoutShow extends Component
     {
         $user = auth()->user();
         $attempts = $this->package->attempts()->where('user_id', $user->id)->latest('id')->get();
+        $uncompletedMaterials = $this->package->uncompletedMaterialsFor($user);
+        $totalPrerequisites = $this->package->prerequisiteMaterialsFor($user)->count();
 
         return view('livewire.tryout.show', [
             'unlocked' => $this->package->isAccessibleBy($user),
+            'prerequisitesMet' => $uncompletedMaterials->isEmpty(),
+            'uncompletedMaterials' => $uncompletedMaterials,
+            'totalPrerequisites' => $totalPrerequisites,
+            'completedPrerequisites' => max(0, $totalPrerequisites - $uncompletedMaterials->count()),
             'attempts' => $attempts,
             'running' => $attempts->first(fn ($attempt) => $attempt->isInProgress() && ! $attempt->isExpired()),
             'attemptsLeft' => $this->package->max_attempts === null ? null : max(0, $this->package->max_attempts - $attempts->count()),

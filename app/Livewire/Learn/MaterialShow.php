@@ -12,6 +12,8 @@ use Livewire\Component;
 #[Layout('layouts::app')]
 class MaterialShow extends Component
 {
+    use BuildsCoursePlayer;
+
     public Material $material;
 
     public function mount(Material $material): void
@@ -33,6 +35,11 @@ class MaterialShow extends Component
         $points->awardIfChapterCompleted(auth()->user(), $this->material->chapter);
     }
 
+    public function completeAndAdvance(PointService $points): void
+    {
+        $this->completeMaterialAndAdvance(auth()->user(), $this->material, $points);
+    }
+
     public function markIncomplete(): void
     {
         MaterialProgress::query()
@@ -43,23 +50,9 @@ class MaterialShow extends Component
 
     public function render(): View
     {
-        $user = auth()->user();
-        $siblings = Material::query()
-            ->published()
-            ->whereHas('chapter', fn ($query) => $query->where('subject_id', $this->material->chapter->subject_id))
-            ->join('chapters', 'chapters.id', '=', 'materials.chapter_id')
-            ->orderBy('chapters.sort_order')
-            ->orderBy('materials.sort_order')
-            ->select('materials.*')
-            ->get();
+        $category = $this->material->chapter->subject->category;
+        $data = $this->buildCoursePlayerData(auth()->user(), $category, $this->material);
 
-        $index = $siblings->search(fn (Material $item) => $item->id === $this->material->id);
-
-        return view('livewire.learn.material', [
-            'unlocked' => $this->material->isAccessibleBy($user),
-            'completed' => MaterialProgress::query()->where('user_id', $user->id)->where('material_id', $this->material->id)->exists(),
-            'previous' => $index > 0 ? $siblings[$index - 1] : null,
-            'next' => $index !== false ? $siblings->get($index + 1) : null,
-        ])->title($this->material->title);
+        return view('livewire.learn.material', $data)->title($this->material->title);
     }
 }

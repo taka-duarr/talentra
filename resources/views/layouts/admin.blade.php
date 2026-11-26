@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ isset($title) ? $title.' · ' : '' }}Admin Talentra</title>
+    <x-favicon />
     @fonts
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
@@ -20,10 +21,7 @@
                 ['Hasil peserta', 'admin.attempts.index', 'admin.attempts.*', 'chart', true],
             ],
             'Konten' => [
-                ['Kategori & mata uji', 'admin.categories', 'admin.categories*', 'layers', true],
-                ['Materi', 'admin.materials.index', 'admin.materials.*', 'book', true],
-                ['Bank soal', 'admin.questions.index', 'admin.questions.*', 'question', true],
-                ['Paket try out', 'admin.packages.index', 'admin.packages.*', 'clipboard', true],
+                ['Manajemen kursus', 'admin.courses.index', ['admin.courses.*', 'admin.categories*', 'admin.materials.*', 'admin.questions.*', 'admin.packages.*'], 'layers', true],
             ],
             'Komunitas' => [
                 ['Moderasi forum', 'admin.moderation', 'admin.moderation', 'flag', true],

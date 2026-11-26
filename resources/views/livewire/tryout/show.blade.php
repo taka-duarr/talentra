@@ -1,5 +1,8 @@
 <div class="mx-auto max-w-3xl">
-    <a href="{{ route('tryout.index', ['kategori' => $package->category->slug]) }}" wire:navigate class="text-sm font-semibold text-muted hover:text-ink">← Try out {{ $package->category->name }}</a>
+    <div class="flex flex-wrap items-center justify-between gap-2">
+        <a href="{{ route('learn.category', ['category' => $package->category, 'tryout' => $package->slug]) }}" wire:navigate class="text-sm font-semibold text-muted hover:text-ink">← Buka di ruang kursus {{ $package->category->name }}</a>
+        <a href="{{ route('tryout.index', ['kategori' => $package->category->slug]) }}" wire:navigate class="text-sm font-semibold text-brand-700 hover:underline">Semua try out</a>
+    </div>
 
     <div class="card mt-4 p-6 sm:p-8">
         <div class="flex flex-wrap items-center gap-2">
@@ -28,32 +31,42 @@
             @endforeach
         </ul>
 
-        <div class="mt-6 rounded-xl bg-navy-50/60 p-4 text-sm text-muted">
-            <p class="font-semibold text-ink">Sebelum mulai</p>
-            <ul class="mt-2 list-disc space-y-1 pl-5">
-                <li>Timer berjalan di server dan tidak berhenti walaupun halaman ditutup.</li>
-                <li>Jawaban tersimpan otomatis setiap kamu memilih jawaban.</li>
-                <li>Kamu bisa menandai soal sebagai ragu-ragu dan kembali sebelum menyelesaikan ujian.</li>
-                @if ($package->counts_for_ranking)
-                    <li>Hanya percobaan pertama yang dihitung untuk ranking.</li>
-                @endif
-            </ul>
-        </div>
+        @if ($unlocked && ! $prerequisitesMet && ! $running)
+            <div class="mt-6 rounded-2xl border border-sun-200 bg-sun-100/40 p-5">
+                <p class="font-bold text-ink">Selesaikan materi kursus terlebih dahulu ({{ $completedPrerequisites }}/{{ $totalPrerequisites }} selesai)</p>
+                <p class="mt-1 text-sm text-muted">Pelajari seluruh materi yang terbuka di kursus {{ $package->category->name }} sebelum mengerjakan Tes Try Out ini.</p>
+                <a href="{{ route('learn.material', $uncompletedMaterials->first()) }}" wire:navigate class="btn btn-primary mt-4">
+                    Pelajari materi: {{ $uncompletedMaterials->first()->title }} →
+                </a>
+            </div>
+        @else
+            <div class="mt-6 rounded-xl bg-navy-50/60 p-4 text-sm text-muted">
+                <p class="font-semibold text-ink">Sebelum mulai</p>
+                <ul class="mt-2 list-disc space-y-1 pl-5">
+                    <li>Timer berjalan di server dan tidak berhenti walaupun halaman ditutup.</li>
+                    <li>Jawaban tersimpan otomatis setiap kamu memilih jawaban.</li>
+                    <li>Kamu bisa menandai soal sebagai ragu-ragu dan kembali sebelum menyelesaikan ujian.</li>
+                    @if ($package->counts_for_ranking)
+                        <li>Hanya percobaan pertama yang dihitung untuk ranking.</li>
+                    @endif
+                </ul>
+            </div>
 
-        <div class="mt-6">
-            @if ($running)
-                <a href="{{ route('exam.show', $running) }}" class="btn btn-navy w-full py-3 sm:w-auto">Lanjutkan ujian (sisa {{ ceil($running->remainingSeconds() / 60) }} menit)</a>
-            @elseif (! $unlocked)
-                <a href="{{ route('plans.index') }}" wire:navigate class="btn btn-primary w-full py-3 sm:w-auto">Buka dengan langganan</a>
-            @elseif ($attemptsLeft === 0)
-                <p class="text-sm font-semibold text-coral-600">Kesempatan mengerjakan paket ini sudah habis.</p>
-            @else
-                <form method="POST" action="{{ route('exam.start', $package) }}">
-                    @csrf
-                    <button type="submit" class="btn btn-primary w-full py-3 sm:w-auto">{{ $attempts->isEmpty() ? 'Mulai try out' : 'Kerjakan lagi' }}</button>
-                </form>
-            @endif
-        </div>
+            <div class="mt-6">
+                @if ($running)
+                    <a href="{{ route('exam.show', $running) }}" class="btn btn-navy w-full py-3 sm:w-auto">Lanjutkan ujian (sisa {{ ceil($running->remainingSeconds() / 60) }} menit)</a>
+                @elseif (! $unlocked)
+                    <a href="{{ route('plans.index') }}" wire:navigate class="btn btn-primary w-full py-3 sm:w-auto">Buka dengan langganan</a>
+                @elseif ($attemptsLeft === 0)
+                    <p class="text-sm font-semibold text-coral-600">Kesempatan mengerjakan paket ini sudah habis.</p>
+                @else
+                    <form method="POST" action="{{ route('exam.start', $package) }}">
+                        @csrf
+                        <button type="submit" class="btn btn-primary w-full py-3 sm:w-auto">{{ $attempts->isEmpty() ? 'Mulai try out' : 'Kerjakan lagi' }}</button>
+                    </form>
+                @endif
+            </div>
+        @endif
     </div>
 
     @if ($attempts->where('status.value', 'submitted')->isNotEmpty())

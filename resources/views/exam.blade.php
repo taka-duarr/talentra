@@ -8,6 +8,7 @@
     @vite(['resources/js/exam.js'])
     <x-inertia::head>
         <title>Ujian · Talentra</title>
+        <x-favicon />
     </x-inertia::head>
 </head>
 <body class="min-h-screen bg-canvas font-sans">
